@@ -15,7 +15,7 @@ from Cryptodome.Util.Padding import pad,unpad
 from dotenv import load_dotenv
 
 load_dotenv()
-f = open(os.getenv("REQUEST_BODY_PATH"), "r")
+f = open(os.getenv("REQUEST_BODY_PATH",'request_bod_raw_text.txt'), "r")
 request_body_raw_text = f.read()
 def hash_message(msg: str):
     HASHER = nacl.hash.blake2b
@@ -114,10 +114,17 @@ def generate_key_pairs():
     )
     crypto_private_key = base64.b64encode(bytes_private_key).decode('utf-8')
     crypto_public_key = base64.b64encode(bytes_public_key).decode('utf-8')
-    return {"Signing_private_key": private_key,
-            "Signing_public_key": public_key,
-            "Crypto_Privatekey": crypto_private_key,
-            "Crypto_Publickey": crypto_public_key}
+    env_variables = {
+    "PRIVATE_KEY": private_key,
+    "PUBLIC_KEY": public_key,
+    "CRYPTO_PRIVATE_KEY": crypto_private_key,
+    "CRYPTO_PUBLIC_KEY": crypto_public_key,
+    }
+    with open('.env', 'w') as env_file:
+        for key, value in env_variables.items():
+            env_file.write(f"{key}={value}\n")  
+
+    return env_variables
 
 
 def encrypt(crypto_private_key, crypto_public_key, null):
